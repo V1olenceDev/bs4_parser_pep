@@ -37,3 +37,5 @@ EXPECTED_STATUS = {
 PRETTY_OUTPUT = 'pretty'
 FILE_OUTPUT = 'file'
 DEFAULT_OUTPUT = None
+DOWNLOADS = 'downloads'
+RESULTS = 'results'

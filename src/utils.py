@@ -18,11 +18,8 @@ def get_response(session, url, encoding='utf-8'):
         response = session.get(url)
         response.encoding = encoding
         return response
-    except RequestException:
-        logging.exception(
-            BROKEN_URL.format(url=url),
-            stack_info=True
-        )
+    except RequestException as e:
+        raise RequestException(BROKEN_URL.format(url=url)) from e
 
 
 def find_tag(soup, tag, attrs=None):
@@ -53,9 +50,14 @@ def get_soup(session, url, features='lxml'):
     """
     Получение и парсинг HTML-содержимого по URL.
     """
-    response = get_response(session, url)
-    if response is None:
+    try:
+        response = get_response(session, url)
+    except RequestException as e:
         logging.error(RESPONSE_IS_NONE.format(url=url))
-        return
+        raise e
+
+    if response is None:
+        raise Exception(RESPONSE_IS_NONE.format(url=url))
+
     soup = BeautifulSoup(response.text, features)
     return soup

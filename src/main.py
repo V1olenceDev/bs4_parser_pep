@@ -14,7 +14,8 @@ from constants import (
     EXPECTED_STATUS,
     MAIN_DOC_URL,
     PEPS_PYTHON_URL,
-    WHATS_NEW_URL)
+    WHATS_NEW_URL,
+    DOWNLOADS)
 from exceptions import (
     ERROR,
     NOT_FOUND,
@@ -65,10 +66,8 @@ def pep(session):
                  status_tuple=status_tuple
                 )
             )
-        if pep_page_status in temp_results:
-            temp_results[pep_page_status] += 1
-        else:
-            temp_results[pep_page_status] = 1
+        temp_results.setdefault(pep_page_status, 0)
+        temp_results[pep_page_status] += 1
         total_pep += 1
     list(map(logging.warning, logs))
     temp_results['Total'] = total_pep
@@ -132,7 +131,7 @@ def download(session):
     )['href']
     archive_url = urljoin(DOWNLOAD_DOC_URL, pdf_a4_link)
     filename = archive_url.split('/')[-1]
-    DOWNLOADS_DIR = BASE_DIR / 'downloads'
+    DOWNLOADS_DIR = BASE_DIR / DOWNLOADS
     DOWNLOADS_DIR.mkdir(exist_ok=True)
     archive_path = DOWNLOADS_DIR / filename
     response = session.get(archive_url)
