@@ -16,3 +16,13 @@ class ParserFindTagException(Exception):
     """Исключение, вызываемое при неудачной"""
     """попытке найти определённый тег в HTML-документе."""
     pass
+
+
+class URLRetrievalError(Exception):
+    """Исключение, возникающее при ошибках получения URL."""
+    pass
+
+
+class NoResponseException(Exception):
+    """Исключение, возникающее при отсутствии ответа от сервера."""
+    pass

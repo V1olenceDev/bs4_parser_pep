@@ -20,7 +20,9 @@ from exceptions import (
     ERROR,
     NOT_FOUND,
     UNEXPECTED_STATUS,
-    ParserFindTagException)
+    ParserFindTagException,
+    URLRetrievalError,
+    NoResponseException)
 from outputs import control_output
 from utils import (
     find_tag,
@@ -164,8 +166,14 @@ def main():
         results = MODE_TO_FUNCTION[parser_mode](session)
         if results is not None:
             control_output(results, args)
-    except Exception as error:
-        logging.exception(ERROR.format(error=error))
+    except ParserFindTagException as e:
+        logging.error(str(e))
+    except URLRetrievalError as e:
+        logging.error(str(e))
+    except NoResponseException as e:
+        logging.error(str(e))
+    except Exception as e:
+        logging.exception(ERROR.format(error=e))
     logging.info(FINISH)
 
 

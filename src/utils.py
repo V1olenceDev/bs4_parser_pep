@@ -1,5 +1,3 @@
-import logging
-
 from bs4 import BeautifulSoup
 from requests import RequestException
 
@@ -7,7 +5,9 @@ from exceptions import (
     BROKEN_URL,
     RESPONSE_IS_NONE,
     TAG_NOT_FOUND,
-    ParserFindTagException)
+    ParserFindTagException,
+    URLRetrievalError,
+    NoResponseException)
 
 
 def get_response(session, url, encoding='utf-8'):
@@ -19,7 +19,7 @@ def get_response(session, url, encoding='utf-8'):
         response.encoding = encoding
         return response
     except RequestException as e:
-        raise RequestException(BROKEN_URL.format(url=url)) from e
+        raise URLRetrievalError(BROKEN_URL.format(url=url)) from e
 
 
 def find_tag(soup, tag, attrs=None):
@@ -28,9 +28,6 @@ def find_tag(soup, tag, attrs=None):
     """
     searched_tag = soup.find(tag, attrs=(attrs or {}))
     if searched_tag is None:
-        logging.error(
-            TAG_NOT_FOUND.format(tag=tag, attrs=attrs), stack_info=True
-        )
         raise ParserFindTagException(
             TAG_NOT_FOUND.format(tag=tag, attrs=attrs)
         )
@@ -50,14 +47,8 @@ def get_soup(session, url, features='lxml'):
     """
     Получение и парсинг HTML-содержимого по URL.
     """
-    try:
-        response = get_response(session, url)
-    except RequestException as e:
-        logging.error(RESPONSE_IS_NONE.format(url=url))
-        raise e
-
+    response = get_response(session, url)
     if response is None:
-        raise Exception(RESPONSE_IS_NONE.format(url=url))
-
+        raise NoResponseException(RESPONSE_IS_NONE.format(url=url))
     soup = BeautifulSoup(response.text, features)
     return soup

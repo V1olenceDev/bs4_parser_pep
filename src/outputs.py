@@ -49,7 +49,6 @@ def file_output(results, cli_args):
     with open(file_path, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f,
                             delimiter=',',
-                            quotechar='"',
                             quoting=csv.QUOTE_MINIMAL)
         writer.writerows(results)
     logging.info(CSV_SAVE_SUCCEED.format(file_path=file_path))
