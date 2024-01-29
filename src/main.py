@@ -71,7 +71,7 @@ def pep(session):
         temp_results.setdefault(pep_page_status, 0)
         temp_results[pep_page_status] += 1
         total_pep += 1
-    list(map(logging.warning, logs))
+
     temp_results['Total'] = total_pep
     results += list(temp_results.items())
     return results
@@ -166,11 +166,9 @@ def main():
         results = MODE_TO_FUNCTION[parser_mode](session)
         if results is not None:
             control_output(results, args)
-    except ParserFindTagException as e:
-        logging.error(str(e))
-    except URLRetrievalError as e:
-        logging.error(str(e))
-    except NoResponseException as e:
+    except (ParserFindTagException,
+            URLRetrievalError,
+            NoResponseException) as e:
         logging.error(str(e))
     except Exception as e:
         logging.exception(ERROR.format(error=e))
