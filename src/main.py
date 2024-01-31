@@ -17,7 +17,6 @@ from constants import (
     WHATS_NEW_URL,
     DOWNLOADS)
 from exceptions import (
-    ERROR,
     NOT_FOUND,
     UNEXPECTED_STATUS,
     ParserFindTagException,
@@ -37,16 +36,10 @@ FINISH = 'Парсер завершил работу.'
 
 
 def pep(session):
-    """
-    Главная функция, запускающая парсер документации Python.
-    Конфигурирует логирование, парсит аргументы командной
-    строки и запускает соответствующий режим парсинга.
-    """
     peps_main_page = PEPS_PYTHON_URL
     temp_results = {}
     results = [('Статус', 'Количество')]
     total_pep = 0
-    logs = []
     soup = get_soup(session, peps_main_page)
     trclass = soup.select('#numerical-index table.pep-zero-table tbody tr')
     if not trclass:
@@ -61,7 +54,7 @@ def pep(session):
         pep_page_status = get_pep_page_status(session, pep_link)
 
         if pep_page_status not in status_tuple:
-            logs.append(
+            logging.error(
                 UNEXPECTED_STATUS.format(
                  pep_link=pep_link,
                  pep_page_status=pep_page_status,
@@ -78,7 +71,6 @@ def pep(session):
 
 
 def whats_new(session):
-    """Собирает информацию о новых статьях"""
     result = [('Ссылка на статью', 'Заголовок', 'Редактор, Автор')]
     soup = get_soup(session, WHATS_NEW_URL)
     sections_by_python = soup.select(
@@ -99,7 +91,6 @@ def whats_new(session):
 
 
 def latest_versions(session):
-    """Собирает информацию о последних версиях документации"""
     REG_EX = r'Python (?P<version>\d\.\d+) \((?P<status>.*)\)'
     soup = get_soup(session, MAIN_DOC_URL)
     ul_tags = soup.select('div.sphinxsidebarwrapper ul')
@@ -126,7 +117,6 @@ def latest_versions(session):
 
 
 def download(session):
-    """Скачивает архив с документацией"""
     soup = get_soup(session, DOWNLOAD_DOC_URL)
     pdf_a4_link = soup.select_one(
         'table.docutils a[href$="pdf-a4.zip"]'
@@ -168,10 +158,9 @@ def main():
             control_output(results, args)
     except (ParserFindTagException,
             URLRetrievalError,
-            NoResponseException) as e:
+            NoResponseException,
+            Exception) as e:
         logging.error(str(e))
-    except Exception as e:
-        logging.exception(ERROR.format(error=e))
     logging.info(FINISH)
 
 
